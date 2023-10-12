@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d" x:Name="mainWindow"
-        Height="230" Width="735"
+        Height="280" Width="735"
         FontFamily="Microsoft YaHei UI" FontSize="15"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -30,6 +30,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <Label Margin="10,0,10,0">图标文本，只能写一个字符：</Label>
             <TextBox x:Name="txtIconChar" MaxLength="10" Width="150" Grid.Column="1" HorizontalAlignment="Left" ></TextBox>
@@ -42,6 +43,7 @@
             <Button x:Name="btnKillOld" Click="BtnKillOld_Click" Margin="10,10,10,10" Grid.Column="2" Grid.Row="1" Width="130" HorizontalAlignment="Left">
                 杀死老的进程
             </Button>
+            <Button x:Name="btnAbout" Click="BtnAbout_Click" Margin="10,0,10,10" Grid.Row="2" Width="{Binding ElementName=btnPreview,Path=Width}" HorizontalAlignment="Left">关于</Button>
         </Grid>
         <tb:TaskbarIcon x:Name="icoTaskbar" Visibility="Hidden" ToolTipText="hello" ContextMenu="{StaticResource iconMenu}">
         </tb:TaskbarIcon>

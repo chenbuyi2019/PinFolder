@@ -192,6 +192,10 @@ namespace PinFolder
             }
         }
 
+        private void BtnAbout_Click(object sender, RoutedEventArgs e)
+        {
+            OpenProcess("https://github.com/chenbuyi2019/PinFolder");
+        }
         #endregion
 
         #region 图标生成
