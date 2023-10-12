@@ -11,6 +11,9 @@ using System.Text;
 using Mono.Options;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Windows.Media.Imaging;
+using System.Xml.Linq;
+using System.Windows.Interop;
 
 namespace PinFolder
 {
@@ -122,7 +125,7 @@ namespace PinFolder
             {
                 fileDialog ??= new Microsoft.Win32.OpenFileDialog
                 {
-                    Title = "选择这个文件夹里的任意一个子文件即可",
+                    Title = "选择这个文件夹里的任意一个子文件即可（但不能是快捷方式）",
                     CheckFileExists = true,
                     CheckPathExists = true,
                     AddExtension = true,
@@ -251,6 +254,31 @@ namespace PinFolder
             }
         }
 
+        private static readonly Dictionary<string, BitmapSource> Icons = new();
+
+        private static BitmapSource? GetIcon(string f)
+        {
+            var ext = Path.GetExtension(f);
+            if (string.IsNullOrWhiteSpace(ext))
+            {
+                return null;
+            }
+            ext = ext.ToLower().Trim();
+            if (ext.Equals(".exe") || ext.Equals(".lnk"))
+            {
+                ext = f.ToLower().Trim();
+            }
+            if (Icons.TryGetValue(ext, out var result))
+            {
+                return result;
+            }
+            using var ico = System.Drawing.Icon.ExtractAssociatedIcon(f);
+            if (ico == null) { return null; }
+            var s = Imaging.CreateBitmapSourceFromHIcon(ico.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            Icons.Add(ext, s);
+            return s;
+        }
+
         private void IconMenu_ContextMenuOpened(object sender, EventArgs e)
         {
             if (sender is not ContextMenu menu) { return; }
@@ -276,6 +304,16 @@ namespace PinFolder
                     Tag = info
                 };
                 item.Click += IconMenuItem_Click;
+                var icoSource = info.FullName;
+                if (info.Attributes.HasFlag(FileAttributes.Directory))
+                {
+                    icoSource = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+                }
+                var ico = GetIcon(icoSource);
+                if (ico != null)
+                {
+                    item.Icon = new System.Windows.Controls.Image() { Source = ico };
+                }
                 menu.Items.Add(item);
             }
             menu.Items.Add("");
